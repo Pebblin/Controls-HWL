@@ -37,12 +37,16 @@ MainLoopOutput MainLoop(MainLoopInput const &in) {
 //  motorCommand2 -> located at body +x -y
 //  motorCommand3 -> located at body -x -y
 //  motorCommand4 -> located at body -x +y
+
+// Checks to see if blue button is being pressed
 if (in.joystickInput.buttonBlue) {
+  // Turn on motors if yes
   outVals.motorCommand1 = 50;
   outVals.motorCommand2 = 50;
   outVals.motorCommand3 = 50;
   outVals.motorCommand4 = 50;
 } else {
+  // Turn off if no
   outVals.motorCommand1 = 0;
   outVals.motorCommand2 = 0;
   outVals.motorCommand3 = 0;
