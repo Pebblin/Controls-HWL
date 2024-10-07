@@ -6,8 +6,8 @@ int pwmCommandFromSpeed(float desiredSpeed_rad_per_sec) {
   // number -- this ensures that we use single precision
   // floating point (rather than double precision, which
   // would be substantially slower on the microcontroller).
-  float a = 0.0f;  // the zeroth order term
-  float b = 0.0f;  // the first order term
+  float a = -83.30318f;  // the zeroth order term
+  float b = 0.23595f;  // the first order term
 
   return int(a + b * desiredSpeed_rad_per_sec);
 }
@@ -26,4 +26,3 @@ float speedFromForce(float desiredForce_N) {
 
   return sqrtf(desiredForce_N / propConstant);
 }
-
