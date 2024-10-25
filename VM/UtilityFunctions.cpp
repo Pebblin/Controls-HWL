@@ -16,7 +16,7 @@ float speedFromForce(float desiredForce_N) {
   // replace this with your determined constant:
   // Remember to add the trailing "f" for single
   // precision!
-  float const propConstant = 1.0e-08f;
+  float const propConstant = 2.1e-08f;
 
   //we implement a safety check,
   //  (no sqrtf for negative numbers)
