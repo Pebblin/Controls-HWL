@@ -7,6 +7,8 @@
 // An example of a variable that persists beyond the function call.
 float exampleVariable_float = 0.0f;  // Note the trailing 'f' in the number to force single precision floating point.
 
+
+
 Vec3f exampleVariable_Vec3f = Vec3f(0, 0, 0);
 int exampleVariable_int = 0;
 
@@ -15,18 +17,13 @@ MainLoopInput lastMainLoopInputs;
 MainLoopOutput lastMainLoopOutputs;
 
 // Some constants that we may use:
-<<<<<<< HEAD
-const float mass = 40e-3f;  // mass of the quadcopter [kg]
-=======
-const float mass = 30e-3f;  // mass of the quadcopter [kg]
->>>>>>> 9fe530550d2bbb18b0c2c9be8a5c006e03d27e13
+const float mass = 37e-3f;  // mass of the quadcopter [kg]
 const float gravity = 9.81f;  // acceleration of gravity [m/s^2]
 const float inertia_xx = 16e-6f;  // MMOI about x axis [kg.m^2]
 const float inertia_yy = inertia_xx;  // MMOI about y axis [kg.m^2]
 const float inertia_zz = 29e-6f;  // MMOI about z axis [kg.m^2]
-<<<<<<< HEAD
 const float natFreq_height = 2.0f;
-const float dampingRatio_height = 0.7f;
+const float dampingRatio_height = 0.6f;
 
 const float dt = 1.0f / 500.0f;  // [s] period between successive calls to MainLoop
 
@@ -49,12 +46,12 @@ const float timeConstant_pitchAngle = timeConstant_rollAngle;  // Pitch angle ti
 const float timeConstant_yawAngle = 0.25f;  // Yaw angle time constant [s]
 
 // Constants for the controller time constants
-const float timeConstant_rollRate = 0.04f;  // Roll rate time constant [s]
+const float timeConstant_rollRate = 0.03f;  // Roll rate time constant [s]
 const float timeConstant_pitchRate = timeConstant_rollRate;  // Pitch rate time constant [s]
 const float timeConstant_yawRate = 0.05f;    // Yaw rate time constant [s]
 
 // Constant for horizontal velocity
-const float timeConst_horizVel = 2.0f;  // Horizontal velocity time constant [s]
+const float timeConst_horizVel = 2.5f;  // Horizontal velocity time constant [s]
 
 
 
@@ -62,7 +59,7 @@ const float timeConst_horizVel = 2.0f;  // Horizontal velocity time constant [s]
 Vec3f desAngle = Vec3f(0.0f, 0.0f, 0.0f);
 
 // Desired normalized thrust (acceleration) in m/s^2
-float desNormalizedAcceleration = 10.0f;
+float desNormalizedAcceleration = 5.0f;
 
 // Desired angular velocity in rad/s
 Vec3f desAngularVel = Vec3f(0.0f, 0.0f, 0.0f);
@@ -126,47 +123,16 @@ MainLoopOutput MainLoop(MainLoopInput const &in) {
     }
     Vec3f rateGyro_corr = in.imuMeasurement.rateGyro - estGyroBias;
 
-=======
-
-const float dt = 1.0f / 500.0f;  // [s] period between successive calls to MainLoop
-
-Vec3f estGyroBias = Vec3f(0, 0, 0);
-
-// Estimators for roll, pitch, and yaw angles
-float estRoll = 0;
-float estPitch = 0;
-float estYaw = 0;
-
-// Trade-off factor for the complementary filter
-const float rho = 0.01f;
-
-MainLoopOutput MainLoop(MainLoopInput const &in) {
-    MainLoopOutput outVals;
-
-    // Gyroscope bias estimation during the first second
-    if (in.currentTime < 1.0f) {
-        estGyroBias = estGyroBias + (in.imuMeasurement.rateGyro / 500.0f);
-    }
-    Vec3f rateGyro_corr = in.imuMeasurement.rateGyro - estGyroBias;
-
->>>>>>> 9fe530550d2bbb18b0c2c9be8a5c006e03d27e13
     // Compute accelerometer-based estimates of roll and pitch
     float g_mag = gravity;
     float phi_meas = in.imuMeasurement.accelerometer.y / g_mag; // roll measurement
     float theta_meas = -in.imuMeasurement.accelerometer.x / g_mag; // pitch measurement
 
     // Combined roll estimation (using accelerometer and gyroscope data)
-<<<<<<< HEAD
     estRoll = (1.0f - rho) * (estRoll + dt * rateGyro_corr.x) + rho * phi_meas;
 
     // Combined pitch estimation (using accelerometer and gyroscope data)
     estPitch = (1.0f - rho) * (estPitch + dt * rateGyro_corr.y) + rho * theta_meas;
-=======
-    estRoll = (1 - rho) * (estRoll + dt * rateGyro_corr.x) + rho * phi_meas;
-
-    // Combined pitch estimation (using accelerometer and gyroscope data)
-    estPitch = (1 - rho) * (estPitch + dt * rateGyro_corr.y) + rho * theta_meas;
->>>>>>> 9fe530550d2bbb18b0c2c9be8a5c006e03d27e13
 
     // Update yaw using only gyroscope data (integration)
     estYaw = estYaw + dt * rateGyro_corr.z;
@@ -176,7 +142,6 @@ MainLoopOutput MainLoop(MainLoopInput const &in) {
     outVals.telemetryOutputs_plusMinus100[1] = estPitch;
     outVals.telemetryOutputs_plusMinus100[2] = estYaw;
 
-<<<<<<< HEAD
 
     // In MainLoop():
     // Height estimator - prediction step:
@@ -235,7 +200,7 @@ MainLoopOutput MainLoop(MainLoopInput const &in) {
     desAngle.z = 0; // Desired Yaw
 
     // Setting desired height for total thrust command
-    const float desHeight = 0.5f;
+    const float desHeight = 0.4f;
     const float desAcc3 = -2 * dampingRatio_height * natFreq_height * estVelocity_3
         - natFreq_height * natFreq_height * (estHeight - desHeight);
 
@@ -270,8 +235,13 @@ MainLoopOutput MainLoop(MainLoopInput const &in) {
 //    outVals.telemetryOutputs_plusMinus100[5] = cmdAngAcc.z;
 
     // Calculate the total desired force
-    float desiredForce = mass * desNormalizedAcceleration;
 
+
+      float desiredForce = mass * desNormalizedAcceleration;
+
+    if (in.joystickInput.buttonGreen) {
+         desiredForce = mass * 7.5;
+            }
     //
 
     Vec3f desiredTorque = Vec3f(cmdAngAcc.x * inertia_xx, cmdAngAcc.y * inertia_yy, cmdAngAcc.z * inertia_zz);
@@ -285,15 +255,24 @@ MainLoopOutput MainLoop(MainLoopInput const &in) {
     f4 = 0.25f * (desiredForce + desiredTorque.x / l + desiredTorque.y / l - desiredTorque.z / kappa);
 
 
+    // Reset state estimation if Yellow button is pressed
+    if (in.joystickInput.buttonYellow) {
+           estHeight = 0.0f;
+           estVelocity_1 = 0.0f;
+           estVelocity_2 = 0.0f;
+           estVelocity_3 = 0.0f;
+           estRoll = 0.0f;
+           estPitch = 0.0f;
+           estYaw = 0.0f;
+           estGyroBias = Vec3f(0, 0, 0);
+
+       }
 
 
-
-         outVals.motorCommand1 = pwmCommandFromSpeed(speedFromForce(f1));
-         outVals.motorCommand2 = pwmCommandFromSpeed(speedFromForce(f2));
-         outVals.motorCommand3 = pwmCommandFromSpeed(speedFromForce(f3));
-         outVals.motorCommand4 = pwmCommandFromSpeed(speedFromForce(f4));
-
-
+    outVals.motorCommand1 = pwmCommandFromSpeed(speedFromForce(f1));
+    outVals.motorCommand2 = pwmCommandFromSpeed(speedFromForce(f2));
+    outVals.motorCommand3 = pwmCommandFromSpeed(speedFromForce(f3));
+    outVals.motorCommand4 = pwmCommandFromSpeed(speedFromForce(f4));
 
 
 //    // Log State Estimates
@@ -305,14 +284,6 @@ MainLoopOutput MainLoop(MainLoopInput const &in) {
     outVals.telemetryOutputs_plusMinus100[8] = desAngle.y;
     outVals.telemetryOutputs_plusMinus100[9] = desNormalizedAcceleration;
     outVals.telemetryOutputs_plusMinus100[10] = f1 + f2 + f3 + f4;
-=======
-    // Set motor commands (currently zero)
-    outVals.motorCommand1 = 0;
-    outVals.motorCommand2 = 0;
-    outVals.motorCommand3 = 0;
-    outVals.motorCommand4 = 0;
-
->>>>>>> 9fe530550d2bbb18b0c2c9be8a5c006e03d27e13
     // Copy the inputs and outputs for debugging
     lastMainLoopInputs = in;
     lastMainLoopOutputs = outVals;
@@ -321,26 +292,17 @@ MainLoopOutput MainLoop(MainLoopInput const &in) {
 
 void PrintStatus() {
     // Accelerometer readings
-<<<<<<< HEAD
     printf("Acc: x=%6.3f, y=%6.3f, z=%6.3f\n",
-=======
-    printf("Acc: x=%6.3f, y=%6.3f, z=%6.3f\n", 
->>>>>>> 9fe530550d2bbb18b0c2c9be8a5c006e03d27e13
            double(lastMainLoopInputs.imuMeasurement.accelerometer.x),
            double(lastMainLoopInputs.imuMeasurement.accelerometer.y),
            double(lastMainLoopInputs.imuMeasurement.accelerometer.z));
 
     // Raw gyroscope readings
-<<<<<<< HEAD
     printf("Gyro (raw): x=%6.3f, y=%6.3f, z=%6.3f\n",
-=======
-    printf("Gyro (raw): x=%6.3f, y=%6.3f, z=%6.3f\n", 
->>>>>>> 9fe530550d2bbb18b0c2c9be8a5c006e03d27e13
            double(lastMainLoopInputs.imuMeasurement.rateGyro.x),
            double(lastMainLoopInputs.imuMeasurement.rateGyro.y),
            double(lastMainLoopInputs.imuMeasurement.rateGyro.z));
 
-<<<<<<< HEAD
     //print motor forces
     printf("Motor Forces: f1=%6.3f, f2=%6.3f, f3=%6.3f, f4=%6.3f\n", f1, f2, f3, f4);
     //print motor speeds
@@ -355,30 +317,13 @@ void PrintStatus() {
 
     // Estimated roll, pitch, and yaw
     printf("Estimated Attitude: Roll=%6.3f, Pitch=%6.3f, Yaw=%6.3f\n",
-=======
-    // Corrected gyroscope readings
-    Vec3f rateGyro_corr = lastMainLoopInputs.imuMeasurement.rateGyro - estGyroBias;
-    printf("Gyro (corrected): x=%6.3f, y=%6.3f, z=%6.3f\n", 
-           double(rateGyro_corr.x), double(rateGyro_corr.y), double(rateGyro_corr.z));
-
-    // Gyroscope bias
-    printf("Gyro Bias: x=%6.3f, y=%6.3f, z=%6.3f\n", 
-           double(estGyroBias.x), double(estGyroBias.y), double(estGyroBias.z));
-
-    // Estimated roll, pitch, and yaw
-    printf("Estimated Attitude: Roll=%6.3f, Pitch=%6.3f, Yaw=%6.3f\n", 
->>>>>>> 9fe530550d2bbb18b0c2c9be8a5c006e03d27e13
            double(estRoll), double(estPitch), double(estYaw));
 
     // Example variables
     printf("Example variable values:\n");
     printf("  exampleVariable_int = %d\n", exampleVariable_int);
     printf("  exampleVariable_float = %6.3f\n", double(exampleVariable_float));
-<<<<<<< HEAD
     printf("  exampleVariable_Vec3f = (%6.3f, %6.3f, %6.3f)\n",
-=======
-    printf("  exampleVariable_Vec3f = (%6.3f, %6.3f, %6.3f)\n", 
->>>>>>> 9fe530550d2bbb18b0c2c9be8a5c006e03d27e13
            double(exampleVariable_Vec3f.x), double(exampleVariable_Vec3f.y), double(exampleVariable_Vec3f.z));
 
     // Last main loop inputs
@@ -396,7 +341,6 @@ void PrintStatus() {
     // Last main loop outputs
     printf("Last main loop outputs:\n");
     printf("  motor command 1 = %6.3f\n", double(lastMainLoopOutputs.motorCommand1));
-<<<<<<< HEAD
     printf("  motor command 2 = %6.3f\n", double(lastMainLoopOutputs.motorCommand2));
     printf("  motor command 3 = %6.3f\n", double(lastMainLoopOutputs.motorCommand3));
     printf("  motor command 4 = %6.3f\n", double(lastMainLoopOutputs.motorCommand4));
@@ -406,6 +350,3 @@ void PrintStatus() {
     static_cast<double>(lastMainLoopInputs.opticalFlowSensor.value_x),
     static_cast<double>(lastMainLoopInputs.opticalFlowSensor.value_y));
 }
-=======
-}
->>>>>>> 9fe530550d2bbb18b0c2c9be8a5c006e03d27e13
